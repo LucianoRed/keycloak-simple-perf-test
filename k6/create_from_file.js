@@ -1,14 +1,14 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
-import { fail } from 'k6';
 import { SharedArray } from 'k6/data';
+import { fail } from 'k6';
 
 export let options = {
-    vus: 100,
-    duration: '1m',
-    insecureSkipTLSVerify: true,
+    vus: 100, // Número de usuários virtuais simultâneos
+    duration: '1m', // Tempo de duração do teste
+    insecureSkipTLSVerify: true, // Ignorar erros de certificado SSL
     thresholds: {
-        http_req_failed: ['rate<0.01'],
+        http_req_failed: ['rate<0.01'], // 99% das requisições devem ser bem-sucedidas
     },
 };
 
@@ -24,8 +24,8 @@ export default function () {
 
     const url = `${keycloakUrl}/auth/admin/realms/${realmName}/users`;
 
-    // Selecionar uma credencial aleatória do arquivo
-    const user = credentials[__VU % credentials.length];
+    // Selecionar uma credencial de forma sequencial
+    const user = credentials[__ITER]; // Seleciona a credencial sequencialmente com base na iteração
 
     let payload = JSON.stringify({
         username: user.username,
@@ -48,13 +48,14 @@ export default function () {
     let res = http.post(url, payload, params);
 
     if (res.status !== 201) {
-        console.log(`Falha ao registrar usuário. Status: ${res.status}`);
+        console.log(`Falha ao registrar usuário ${user.username}. Status: ${res.status}`);
         console.log(`Resposta completa: ${res.body}`);
     }
 
+    // Verificar se a requisição foi bem-sucedida
     check(res, {
         'Status é 201': (r) => r.status === 201,
-    }) || fail(`Falha ao criar o usuário. Status: ${res.status}`);
+    }) || fail(`Falha ao criar o usuário ${user.username}. Status: ${res.status}`);
 
     sleep(1);
 }
