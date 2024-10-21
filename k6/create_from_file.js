@@ -24,8 +24,16 @@ export default function () {
 
     const url = `${keycloakUrl}/auth/admin/realms/${realmName}/users`;
 
-    // Selecionar uma credencial de forma sequencial
-    const user = credentials[__ITER]; // Seleciona a credencial sequencialmente com base na iteração
+    // Calcular um índice único para cada execução usando __VU e __ITER
+    const index = (__VU - 1) + (__ITER * __ENV.vus);
+
+    // Garantir que o índice não exceda o tamanho das credenciais
+    if (index >= credentials.length) {
+        fail(`Não há mais credenciais disponíveis para uso (índice ${index})`);
+    }
+
+    // Selecionar uma credencial de forma sequencial usando o índice calculado
+    const user = credentials[index];
 
     let payload = JSON.stringify({
         username: user.username,
