@@ -15,11 +15,16 @@ for i in $(seq 1 $NUM_USERS); do
     password="Test@123"
     
     # Adicionar usuário ao arquivo JSON
-    echo "  {\"username\": \"$username\", \"password\": \"$password\"}," >> $OUTPUT_FILE
+    if [[ $i -eq $NUM_USERS ]]; then
+        # Último usuário sem vírgula
+        echo "  {\"username\": \"$username\", \"password\": \"$password\"}" >> $OUTPUT_FILE
+    else
+        # Adicionar vírgula nos outros usuários
+        echo "  {\"username\": \"$username\", \"password\": \"$password\"}," >> $OUTPUT_FILE
+    fi
 done
 
-# Remover a última vírgula e fechar o JSON
-sed -i '$ s/,$//' $OUTPUT_FILE
+# Fechar o JSON
 echo "]" >> $OUTPUT_FILE
 
 echo "Arquivo $OUTPUT_FILE criado com $NUM_USERS usuários."
