@@ -8,7 +8,7 @@ export let options = {
 };
 
 export default function () {
-    const url = 'http://${__ENV.ENDERECO_KEYCLOAK}/auth/realms/${ENV__.REALM}/protocol/openid-connect/token';
+    const url = 'https://${__ENV.ENDERECO_KEYCLOAK}/auth/realms/${ENV__.REALM}/protocol/openid-connect/token';
     
     // Informações de cadastro de um novo usuário
     let payload = JSON.stringify({
